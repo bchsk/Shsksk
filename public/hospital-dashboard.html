@@ -1,0 +1,775 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>لوحة تحكم المستشفى</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: #f5f7fa;
+            min-height: 100vh;
+            display: flex;
+        }
+
+        /* الشريط الجانبي */
+        .sidebar {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            width: 280px;
+            min-height: 100vh;
+            padding: 2rem 0;
+            position: fixed;
+            right: 0;
+            top: 0;
+            transition: all 0.3s;
+            z-index: 1000;
+        }
+
+        .logo {
+            text-align: center;
+            margin-bottom: 2rem;
+            padding: 0 1.5rem;
+        }
+
+        .logo h2 {
+            font-size: 1.5rem;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            justify-content: center;
+        }
+
+        .menu {
+            list-style: none;
+        }
+
+        .menu-item {
+            margin-bottom: 5px;
+        }
+
+        .menu-item a {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            color: white;
+            text-decoration: none;
+            padding: 15px 25px;
+            transition: all 0.3s;
+            border-right: 4px solid transparent;
+        }
+
+        .menu-item a:hover,
+        .menu-item a.active {
+            background: rgba(255, 255, 255, 0.1);
+            border-right-color: white;
+        }
+
+        .menu-item i {
+            width: 20px;
+            text-align: center;
+        }
+
+        .user-info {
+            padding: 1.5rem;
+            border-top: 1px solid rgba(255,255,255,0.1);
+            margin-top: auto;
+            position: absolute;
+            bottom: 0;
+            width: 100%;
+        }
+
+        .user-info p {
+            margin-bottom: 10px;
+            opacity: 0.9;
+        }
+
+        .logout-btn {
+            background: rgba(255, 255, 255, 0.2);
+            color: white;
+            border: none;
+            padding: 8px 15px;
+            border-radius: 5px;
+            cursor: pointer;
+            width: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            transition: background 0.3s;
+        }
+
+        .logout-btn:hover {
+            background: rgba(255, 255, 255, 0.3);
+        }
+
+        /* المحتوى الرئيسي */
+        .main-content {
+            flex: 1;
+            margin-right: 280px;
+            padding: 2rem;
+            transition: margin-right 0.3s;
+        }
+
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2rem;
+            background: white;
+            padding: 1.5rem;
+            border-radius: 15px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+        }
+
+        .page-title h1 {
+            color: #333;
+            font-size: 1.8rem;
+        }
+
+        .hospital-name {
+            color: #667eea;
+            font-weight: 600;
+        }
+
+        /* إحصائيات */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .stat-card {
+            background: white;
+            padding: 1.5rem;
+            border-radius: 15px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+            text-align: center;
+            border-top: 4px solid #667eea;
+        }
+
+        .stat-icon {
+            font-size: 2.5rem;
+            color: #667eea;
+            margin-bottom: 1rem;
+        }
+
+        .stat-number {
+            font-size: 2.5rem;
+            font-weight: 700;
+            color: #333;
+            margin-bottom: 0.5rem;
+        }
+
+        .stat-label {
+            color: #666;
+            font-size: 1rem;
+        }
+
+        /* الجداول */
+        .section-title {
+            margin: 2rem 0 1rem;
+            color: #333;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .table-container {
+            background: white;
+            border-radius: 15px;
+            overflow: hidden;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+            margin-bottom: 2rem;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        thead {
+            background: #f8f9fa;
+        }
+
+        th {
+            padding: 1.2rem;
+            text-align: right;
+            color: #667eea;
+            font-weight: 600;
+            border-bottom: 2px solid #eee;
+        }
+
+        td {
+            padding: 1rem 1.2rem;
+            border-bottom: 1px solid #eee;
+        }
+
+        .status-badge {
+            padding: 5px 15px;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            font-weight: 500;
+        }
+
+        .status-pending {
+            background: #fff3cd;
+            color: #856404;
+        }
+
+        .status-completed {
+            background: #d4edda;
+            color: #155724;
+        }
+
+        /* الأزرار */
+        .btn {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 12px 25px;
+            border-radius: 10px;
+            cursor: pointer;
+            font-size: 1rem;
+            font-weight: 600;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            transition: all 0.3s;
+            text-decoration: none;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.3);
+        }
+
+        .btn-small {
+            padding: 8px 15px;
+            font-size: 0.9rem;
+        }
+
+        /* هامبرجر للجوال */
+        .mobile-toggle {
+            display: none;
+            background: #667eea;
+            color: white;
+            border: none;
+            padding: 10px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 1.2rem;
+        }
+
+        /* تصميم متجاوب */
+        @media (max-width: 992px) {
+            .sidebar {
+                right: -280px;
+            }
+
+            .sidebar.active {
+                right: 0;
+            }
+
+            .main-content {
+                margin-right: 0;
+            }
+
+            .mobile-toggle {
+                display: block;
+            }
+
+            .stats-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+
+        @media (max-width: 768px) {
+            .main-content {
+                padding: 1rem;
+            }
+
+            .header {
+                flex-direction: column;
+                gap: 1rem;
+                text-align: center;
+            }
+
+            .stats-grid {
+                grid-template-columns: 1fr;
+            }
+
+            table {
+                display: block;
+                overflow-x: auto;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .btn {
+                padding: 10px 20px;
+                font-size: 0.9rem;
+            }
+
+            .stat-number {
+                font-size: 2rem;
+            }
+        }
+
+        /* أنيميشن */
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .fade-in {
+            animation: fadeIn 0.5s ease-out;
+        }
+    </style>
+</head>
+<body>
+    <!-- الشريط الجانبي -->
+    <aside class="sidebar" id="sidebar">
+        <div class="logo">
+            <h2><i class="fas fa-hospital"></i> لوحة التحكم</h2>
+        </div>
+        
+        <ul class="menu">
+            <li class="menu-item">
+                <a href="hospital-dashboard.html" class="active">
+                    <i class="fas fa-home"></i>
+                    <span>الرئيسية</span>
+                </a>
+            </li>
+            <li class="menu-item">
+                <a href="add-patient.html">
+                    <i class="fas fa-user-plus"></i>
+                    <span>إضافة طفل</span>
+                </a>
+            </li>
+            <li class="menu-item">
+                <a href="view-patients.html">
+                    <i class="fas fa-users"></i>
+                    <span>قائمة المرضى</span>
+                </a>
+            </li>
+            <li class="menu-item">
+                <a href="#">
+                    <i class="fas fa-syringe"></i>
+                    <span>التطعيمات</span>
+                </a>
+            </li>
+            <li class="menu-item">
+                <a href="#">
+                    <i class="fas fa-chart-bar"></i>
+                    <span>التقارير</span>
+                </a>
+            </li>
+            <li class="menu-item">
+                <a href="#">
+                    <i class="fas fa-cog"></i>
+                    <span>الإعدادات</span>
+                </a>
+            </li>
+        </ul>
+
+        <div class="user-info">
+            <p><i class="fas fa-hospital"></i> <span id="hospitalName">جاري التحميل...</span></p>
+            <button class="logout-btn" id="logoutBtn">
+                <i class="fas fa-sign-out-alt"></i>
+                تسجيل خروج
+            </button>
+        </div>
+    </aside>
+
+    <!-- المحتوى الرئيسي -->
+    <main class="main-content">
+        <!-- زر التبديل للجوال -->
+        <button class="mobile-toggle" id="mobileToggle">
+            <i class="fas fa-bars"></i>
+        </button>
+
+        <!-- الرأس -->
+        <div class="header">
+            <div class="page-title">
+                <h1>مرحباً بك في <span class="hospital-name" id="hospitalNameTitle">المستشفى</span></h1>
+                <p>لوحة تحكم نظام تذكير التطعيمات</p>
+            </div>
+            <a href="add-patient.html" class="btn">
+                <i class="fas fa-plus"></i>
+                إضافة طفل جديد
+            </a>
+        </div>
+
+        <!-- الإحصائيات -->
+        <div class="stats-grid" id="statsContainer">
+            <!-- سيتم تعبئتها بالجافاسكريبت -->
+        </div>
+
+        <!-- التطعيمات القادمة -->
+        <div class="section-title">
+            <h2><i class="fas fa-calendar-alt"></i> التطعيمات القادمة هذا الأسبوع</h2>
+            <a href="#" class="btn btn-small">عرض الكل</a>
+        </div>
+        
+        <div class="table-container">
+            <div id="upcomingVaccines">
+                <!-- سيتم تعبئتها بالجافاسكريبت -->
+            </div>
+        </div>
+
+        <!-- آخر المرضى المضافين -->
+        <div class="section-title">
+            <h2><i class="fas fa-history"></i> آخر المرضى المضافين</h2>
+            <a href="view-patients.html" class="btn btn-small">عرض الكل</a>
+        </div>
+        
+        <div class="table-container">
+            <div id="recentPatients">
+                <!-- سيتم تعبئتها بالجافاسكريبت -->
+            </div>
+        </div>
+    </main>
+
+    <!-- JavaScript -->
+    <script>
+        // بيانات افتراضية (سنتصل بالسيرفر لاحقاً)
+        let hospitalData = {};
+        let statsData = {};
+        let patientsData = [];
+
+        // تهيئة الصفحة
+        document.addEventListener('DOMContentLoaded', function() {
+            loadHospitalData();
+            loadStats();
+            loadUpcomingVaccines();
+            loadRecentPatients();
+            setupEventListeners();
+        });
+
+        // تحميل بيانات المستشفى
+        async function loadHospitalData() {
+            try {
+                // جلب التوكن من localStorage
+                const token = localStorage.getItem('hospitalToken');
+                
+                if (!token) {
+                    window.location.href = 'hospital-login.html';
+                    return;
+                }
+
+                // جلب بيانات المستشفى من السيرفر
+                const response = await fetch('/api/hospitals/profile', {
+                    headers: {
+                        'Authorization': `Bearer ${token}`
+                    }
+                });
+
+                const data = await response.json();
+                
+                if (data.success) {
+                    hospitalData = data.hospital;
+                    document.getElementById('hospitalName').textContent = hospitalData.name;
+                    document.getElementById('hospitalNameTitle').textContent = hospitalData.name;
+                } else {
+                    throw new Error(data.error || 'فشل في جلب البيانات');
+                }
+            } catch (error) {
+                console.error('خطأ في تحميل بيانات المستشفى:', error);
+                // استخدام بيانات تجريبية للعرض
+                hospitalData = {
+                    name: 'مستشفى الأمومة والطفولة',
+                    email: 'hospital@example.com'
+                };
+                document.getElementById('hospitalName').textContent = hospitalData.name;
+                document.getElementById('hospitalNameTitle').textContent = hospitalData.name;
+            }
+        }
+
+        // تحميل الإحصائيات
+        async function loadStats() {
+            try {
+                const token = localStorage.getItem('hospitalToken');
+                const response = await fetch('/api/stats', {
+                    headers: {
+                        'Authorization': `Bearer ${token}`
+                    }
+                });
+
+                const data = await response.json();
+                
+                if (data.success) {
+                    statsData = data.stats;
+                    renderStats();
+                }
+            } catch (error) {
+                console.error('خطأ في تحميل الإحصائيات:', error);
+                // إحصائيات تجريبية
+                statsData = {
+                    totalPatients: 45,
+                    totalVaccines: 180,
+                    completedVaccines: 150,
+                    pendingVaccines: 30,
+                    completionRate: 83
+                };
+                renderStats();
+            }
+        }
+
+        // عرض الإحصائيات
+        function renderStats() {
+            const statsContainer = document.getElementById('statsContainer');
+            statsContainer.innerHTML = `
+                <div class="stat-card fade-in">
+                    <div class="stat-icon"><i class="fas fa-users"></i></div>
+                    <div class="stat-number">${statsData.totalPatients}</div>
+                    <div class="stat-label">إجمالي المرضى</div>
+                </div>
+                <div class="stat-card fade-in" style="animation-delay: 0.1s">
+                    <div class="stat-icon"><i class="fas fa-syringe"></i></div>
+                    <div class="stat-number">${statsData.totalVaccines}</div>
+                    <div class="stat-label">إجمالي التطعيمات</div>
+                </div>
+                <div class="stat-card fade-in" style="animation-delay: 0.2s">
+                    <div class="stat-icon"><i class="fas fa-check-circle"></i></div>
+                    <div class="stat-number">${statsData.completedVaccines}</div>
+                    <div class="stat-label">التطعيمات المكتملة</div>
+                </div>
+                <div class="stat-card fade-in" style="animation-delay: 0.3s">
+                    <div class="stat-icon"><i class="fas fa-chart-line"></i></div>
+                    <div class="stat-number">${statsData.completionRate}%</div>
+                    <div class="stat-label">نسبة الإنجاز</div>
+                </div>
+            `;
+        }
+
+        // تحميل التطعيمات القادمة
+        async function loadUpcomingVaccines() {
+            try {
+                const token = localStorage.getItem('hospitalToken');
+                const response = await fetch('/api/upcoming-vaccines?days=7', {
+                    headers: {
+                        'Authorization': `Bearer ${token}`
+                    }
+                });
+
+                const data = await response.json();
+                
+                if (data.success) {
+                    renderUpcomingVaccines(data.vaccines);
+                }
+            } catch (error) {
+                console.error('خطأ في تحميل التطعيمات القادمة:', error);
+                // بيانات تجريبية
+                const sampleVaccines = [
+                    {
+                        name: 'اللقاح الثلاثي البكتيري',
+                        dueDate: new Date(Date.now() + 2 * 24 * 60 * 60 * 1000),
+                        patientId: {
+                            childName: 'أحمد محمد',
+                            motherPhone: '0555555555'
+                        }
+                    },
+                    {
+                        name: 'شلل الأطفال الفموي',
+                        dueDate: new Date(Date.now() + 3 * 24 * 60 * 60 * 1000),
+                        patientId: {
+                            childName: 'سارة علي',
+                            motherPhone: '0555555556'
+                        }
+                    }
+                ];
+                renderUpcomingVaccines(sampleVaccines);
+            }
+        }
+
+        // عرض التطعيمات القادمة
+        function renderUpcomingVaccines(vaccines) {
+            const container = document.getElementById('upcomingVaccines');
+            
+            if (vaccines.length === 0) {
+                container.innerHTML = `
+                    <div style="padding: 2rem; text-align: center; color: #666;">
+                        <i class="fas fa-calendar-check" style="font-size: 3rem; margin-bottom: 1rem; color: #ddd;"></i>
+                        <p>لا توجد تطعيمات قادمة هذا الأسبوع</p>
+                    </div>
+                `;
+                return;
+            }
+
+            let html = `
+                <table>
+                    <thead>
+                        <tr>
+                            <th>اسم الطفل</th>
+                            <th>رقم الأم</th>
+                            <th>التطعيم</th>
+                            <th>تاريخ الاستحقاق</th>
+                            <th>الإجراءات</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+            `;
+
+            vaccines.forEach(vaccine => {
+                const dueDate = new Date(vaccine.dueDate);
+                const formattedDate = dueDate.toLocaleDateString('ar-SA');
+                
+                html += `
+                    <tr>
+                        <td>${vaccine.patientId.childName}</td>
+                        <td>${vaccine.patientId.motherPhone}</td>
+                        <td>${vaccine.name}</td>
+                        <td>${formattedDate}</td>
+                        <td>
+                            <button class="btn btn-small" onclick="markAsCompleted('${vaccine._id}')">
+                                <i class="fas fa-check"></i> تم
+                            </button>
+                        </td>
+                    </tr>
+                `;
+            });
+
+            html += '</tbody></table>';
+            container.innerHTML = html;
+        }
+
+        // تحميل آخر المرضى
+        async function loadRecentPatients() {
+            try {
+                const token = localStorage.getItem('hospitalToken');
+                const response = await fetch('/api/patients?limit=5', {
+                    headers: {
+                        'Authorization': `Bearer ${token}`
+                    }
+                });
+
+                const data = await response.json();
+                
+                if (data.success) {
+                    patientsData = data.patients;
+                    renderRecentPatients();
+                }
+            } catch (error) {
+                console.error('خطأ في تحميل المرضى:', error);
+                // بيانات تجريبية
+                patientsData = [
+                    {
+                        _id: '1',
+                        childName: 'محمد أحمد',
+                        motherName: 'فاطمة محمد',
+                        motherPhone: '0555555555',
+                        birthDate: new Date('2024-01-15'),
+                        gender: 'ذكر'
+                    },
+                    {
+                        _id: '2',
+                        childName: 'نورة سعيد',
+                        motherName: 'سعاد أحمد',
+                        motherPhone: '0555555556',
+                        birthDate: new Date('2024-02-20'),
+                        gender: 'أنثى'
+                    }
+                ];
+                renderRecentPatients();
+            }
+        }
+
+        // عرض آخر المرضى
+        function renderRecentPatients() {
+            const container = document.getElementById('recentPatients');
+            
+            if (patientsData.length === 0) {
+                container.innerHTML = `
+                    <div style="padding: 2rem; text-align: center; color: #666;">
+                        <i class="fas fa-user-plus" style="font-size: 3rem; margin-bottom: 1rem; color: #ddd;"></i>
+                        <p>لا يوجد مرضى مسجلين بعد</p>
+                        <a href="add-patient.html" class="btn" style="margin-top: 1rem;">إضافة أول طفل</a>
+                    </div>
+                `;
+                return;
+            }
+
+            let html = `
+                <table>
+                    <thead>
+                        <tr>
+                            <th>اسم الطفل</th>
+                            <th>اسم الأم</th>
+                            <th>رقم الهاتف</th>
+                            <th>تاريخ الميلاد</th>
+                            <th>الجنس</th>
+                            <th>الإجراءات</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+            `;
+
+            patientsData.forEach(patient => {
+                const birthDate = new Date(patient.birthDate);
+                const formattedDate = birthDate.toLocaleDateString('ar-SA');
+                
+                html += `
+                    <tr>
+                        <td>${patient.childName}</td>
+                        <td>${patient.motherName || 'غير محدد'}</td>
+                        <td>${patient.motherPhone}</td>
+                        <td>${formattedDate}</td>
+                        <td>${patient.gender || 'غير محدد'}</td>
+                        <td>
+                            <a href="patient-detail.html?id=${patient._id}" class="btn btn-small">
+                                <i class="fas fa-eye"></i> عرض
+                            </a>
+                        </td>
+                    </tr>
+                `;
+            });
+
+            html += '</tbody></table>';
+            container.innerHTML = html;
+        }
+
+        // إعداد المستمعين للأحداث
+        function setupEventListeners() {
+            // زر التبديل للجوال
+            document.getElementById('mobileToggle').addEventListener('click', function() {
+                document.getElementById('sidebar').classList.toggle('active');
+            });
+
+            // تسجيل الخروج
+            document.getElementById('logoutBtn').addEventListener('click', function() {
+                localStorage.removeItem('hospitalToken');
+                localStorage.removeItem('hospitalData');
+                window.location.href = 'hospital-login.html';
+            });
+
+            // إغلاق القائمة عند النقر خارجها (للجوال)
+            document.addEventListener('click', function(event) {
+                const sidebar = document.getElementById('sidebar');
+                const toggleBtn = document.getElementById('mobileToggle');
+                
+                if (!sidebar.contains(event.target) && !toggleBtn.contains(event.target)) {
+                    sidebar.classList.remove('active');
+                }
+            });
+        }
+
+        // دالة مساعدة: ترميز التطعيم كمكتمل
+        function markAsCompleted(vaccineId) {
+            if (confirm('هل تريد ترميز هذا التطعيم كمكتمل؟')) {
+                // هنا سنرسل طلب للسيرفر
+                alert('تم تحديث حالة التطعيم');
+                loadUpcomingVaccines(); // إعادة تحميل البيانات
+            }
+        }
+    </script>
+</body>
+</html>
