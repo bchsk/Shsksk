@@ -1,0 +1,825 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>صفحة الأم - تطعيمات طفلي</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #e3f2fd 0%, #f3e5f5 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 15px 35px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+
+        /* الهيدر */
+        .header {
+            background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+            color: white;
+            padding: 2rem;
+            text-align: center;
+            position: relative;
+        }
+
+        .header::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" preserveAspectRatio="none"><path d="M0,0 L100,0 L100,100 Z" fill="rgba(255,255,255,0.1)"/></svg>');
+            background-size: cover;
+        }
+
+        .header-content {
+            position: relative;
+            z-index: 1;
+        }
+
+        .logo {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+        }
+
+        .header h1 {
+            font-size: 2rem;
+            margin-bottom: 0.5rem;
+        }
+
+        /* نموذج البحث */
+        .search-box {
+            background: white;
+            padding: 2rem;
+            border-bottom: 1px solid #eee;
+        }
+
+        .input-group {
+            margin-bottom: 1rem;
+        }
+
+        .input-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            color: #555;
+            font-weight: 500;
+        }
+
+        .input-with-icon {
+            position: relative;
+        }
+
+        .input-with-icon input {
+            width: 100%;
+            padding: 15px 50px 15px 15px;
+            border: 2px solid #e0e0e0;
+            border-radius: 10px;
+            font-size: 1rem;
+            transition: all 0.3s;
+        }
+
+        .input-with-icon input:focus {
+            outline: none;
+            border-color: #4facfe;
+            box-shadow: 0 0 0 3px rgba(79, 172, 254, 0.1);
+        }
+
+        .input-with-icon i {
+            position: absolute;
+            left: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #999;
+        }
+
+        .btn {
+            background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            border-radius: 10px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            cursor: pointer;
+            width: 100%;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(79, 172, 254, 0.3);
+        }
+
+        /* محتوى الطفل */
+        .child-content {
+            padding: 2rem;
+            display: none;
+        }
+
+        .child-header {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            margin-bottom: 2rem;
+            padding-bottom: 1rem;
+            border-bottom: 2px solid #f0f0f0;
+        }
+
+        .child-avatar {
+            width: 80px;
+            height: 80px;
+            background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2.5rem;
+            color: white;
+        }
+
+        .child-info h2 {
+            color: #333;
+            margin-bottom: 0.5rem;
+        }
+
+        .child-info p {
+            color: #666;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 5px;
+        }
+
+        /* الإحصائيات */
+        .stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 1rem;
+            margin-bottom: 2rem;
+        }
+
+        .stat-item {
+            background: #f8f9fa;
+            padding: 1.5rem;
+            border-radius: 10px;
+            text-align: center;
+            border-top: 4px solid #4facfe;
+        }
+
+        .stat-number {
+            font-size: 2rem;
+            font-weight: 700;
+            color: #333;
+            margin-bottom: 0.5rem;
+        }
+
+        .stat-label {
+            color: #666;
+            font-size: 0.9rem;
+        }
+
+        /* جدول التطعيمات */
+        .vaccines-section h3 {
+            margin-bottom: 1.5rem;
+            color: #333;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .vaccine-card {
+            background: white;
+            border: 1px solid #e0e0e0;
+            border-radius: 10px;
+            padding: 1.5rem;
+            margin-bottom: 1rem;
+            transition: all 0.3s;
+            border-right: 4px solid #e0e0e0;
+        }
+
+        .vaccine-card:hover {
+            border-color: #4facfe;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+        }
+
+        .vaccine-card.completed {
+            border-right-color: #28a745;
+            background: #f8fff9;
+        }
+
+        .vaccine-card.pending {
+            border-right-color: #ffc107;
+            background: #fffdf6;
+        }
+
+        .vaccine-card.upcoming {
+            border-right-color: #4facfe;
+            background: #f8fcff;
+        }
+
+        .vaccine-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+        }
+
+        .vaccine-name {
+            font-size: 1.2rem;
+            font-weight: 600;
+            color: #333;
+        }
+
+        .vaccine-status {
+            padding: 5px 15px;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            font-weight: 500;
+        }
+
+        .status-completed {
+            background: #d4edda;
+            color: #155724;
+        }
+
+        .status-pending {
+            background: #fff3cd;
+            color: #856404;
+        }
+
+        .status-upcoming {
+            background: #d1ecf1;
+            color: #0c5460;
+        }
+
+        .vaccine-details {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+            margin-top: 1rem;
+        }
+
+        .detail-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            color: #666;
+        }
+
+        /* رسالة الخطأ */
+        .error-message {
+            background: #f8d7da;
+            color: #721c24;
+            padding: 1.5rem;
+            border-radius: 10px;
+            text-align: center;
+            margin: 2rem 0;
+            display: none;
+        }
+
+        /* معلومات المستشفى */
+        .hospital-info {
+            background: #f8f9fa;
+            padding: 1.5rem;
+            border-radius: 10px;
+            margin-top: 2rem;
+            border-right: 4px solid #4facfe;
+        }
+
+        .hospital-info h4 {
+            color: #333;
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        /* الرسائل */
+        .message {
+            padding: 1.5rem;
+            border-radius: 10px;
+            margin: 1rem 0;
+            text-align: center;
+            display: none;
+        }
+
+        .message.success {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+
+        .message.error {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+
+        /* تصميم متجاوب */
+        @media (max-width: 768px) {
+            body {
+                padding: 10px;
+            }
+
+            .header h1 {
+                font-size: 1.5rem;
+            }
+
+            .child-header {
+                flex-direction: column;
+                text-align: center;
+            }
+
+            .stats {
+                grid-template-columns: repeat(2, 1fr);
+            }
+
+            .vaccine-header {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 10px;
+            }
+
+            .vaccine-status {
+                align-self: flex-start;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .stats {
+                grid-template-columns: 1fr;
+            }
+
+            .vaccine-details {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        /* أنيميشن */
+        @keyframes slideDown {
+            from {
+                opacity: 0;
+                transform: translateY(-20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .slide-down {
+            animation: slideDown 0.5s ease-out;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        .fade-in {
+            animation: fadeIn 0.5s ease-out;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- الهيدر -->
+        <div class="header">
+            <div class="header-content">
+                <div class="logo">
+                    <i class="fas fa-baby"></i>
+                </div>
+                <h1>صفحة الأم - تطعيمات طفلي</h1>
+                <p>أدخل رقم هاتفك لمشاهدة سجل تطعيمات طفلك</p>
+            </div>
+        </div>
+
+        <!-- نموذج البحث -->
+        <div class="search-box">
+            <div class="input-group">
+                <label for="phoneNumber"><i class="fas fa-mobile-alt"></i> رقم هاتف الأم</label>
+                <div class="input-with-icon">
+                    <input 
+                        type="tel" 
+                        id="phoneNumber" 
+                        placeholder="مثال: 0555555555"
+                        pattern="[0-9]{10}"
+                        maxlength="10"
+                        required
+                    >
+                    <i class="fas fa-phone"></i>
+                </div>
+                <small style="color: #666; display: block; margin-top: 5px;">أدخل نفس الرقم المسجل في المستشفى</small>
+            </div>
+            <button class="btn" id="searchBtn">
+                <i class="fas fa-search"></i>
+                عرض التطعيمات
+            </button>
+        </div>
+
+        <!-- رسالة الخطأ -->
+        <div class="error-message" id="errorMessage">
+            <i class="fas fa-exclamation-triangle"></i>
+            <span id="errorText">لا يوجد طفل مسجل بهذا الرقم</span>
+        </div>
+
+        <!-- محتوى الطفل -->
+        <div class="child-content" id="childContent">
+            <!-- معلومات الطفل -->
+            <div class="child-header slide-down">
+                <div class="child-avatar">
+                    <i class="fas fa-child"></i>
+                </div>
+                <div class="child-info">
+                    <h2 id="childName">جاري التحميل...</h2>
+                    <p><i class="fas fa-user"></i> <span id="motherName">جاري التحميل...</span></p>
+                    <p><i class="fas fa-birthday-cake"></i> تاريخ الميلاد: <span id="birthDate">جاري التحميل...</span></p>
+                    <p><i class="fas fa-venus-mars"></i> الجنس: <span id="gender">جاري التحميل...</span></p>
+                </div>
+            </div>
+
+            <!-- الإحصائيات -->
+            <div class="stats fade-in" id="statsContainer" style="animation-delay: 0.2s">
+                <!-- سيتم تعبئتها بالجافاسكريبت -->
+            </div>
+
+            <!-- التطعيمات القادمة -->
+            <div class="vaccines-section fade-in" id="upcomingVaccines" style="animation-delay: 0.3s">
+                <h3><i class="fas fa-calendar-plus"></i> التطعيمات القادمة</h3>
+                <div id="upcomingList">
+                    <!-- سيتم تعبئتها بالجافاسكريبت -->
+                </div>
+            </div>
+
+            <!-- جميع التطعيمات -->
+            <div class="vaccines-section fade-in" id="allVaccines" style="animation-delay: 0.4s">
+                <h3><i class="fas fa-syringe"></i> جميع التطعيمات</h3>
+                <div id="vaccinesList">
+                    <!-- سيتم تعبئتها بالجافاسكريبت -->
+                </div>
+            </div>
+
+            <!-- معلومات المستشفى -->
+            <div class="hospital-info fade-in" style="animation-delay: 0.5s">
+                <h4><i class="fas fa-hospital"></i> معلومات المستشفى</h4>
+                <p id="hospitalName">جاري التحميل...</p>
+                <p id="hospitalPhone">جاري التحميل...</p>
+                <p id="hospitalAddress">جاري التحميل...</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- JavaScript -->
+    <script>
+        // عناصر DOM
+        const phoneInput = document.getElementById('phoneNumber');
+        const searchBtn = document.getElementById('searchBtn');
+        const errorMessage = document.getElementById('errorMessage');
+        const errorText = document.getElementById('errorText');
+        const childContent = document.getElementById('childContent');
+        const childName = document.getElementById('childName');
+        const motherName = document.getElementById('motherName');
+        const birthDate = document.getElementById('birthDate');
+        const gender = document.getElementById('gender');
+        const statsContainer = document.getElementById('statsContainer');
+        const upcomingList = document.getElementById('upcomingList');
+        const vaccinesList = document.getElementById('vaccinesList');
+        const hospitalInfo = document.querySelector('.hospital-info');
+
+        // تنسيق التاريخ
+        function formatDate(dateString) {
+            const date = new Date(dateString);
+            return date.toLocaleDateString('ar-SA', {
+                weekday: 'long',
+                year: 'numeric',
+                month: 'long',
+                day: 'numeric'
+            });
+        }
+
+        // تنسيق التاريخ بشكل مختصر
+        function formatShortDate(dateString) {
+            const date = new Date(dateString);
+            return date.toLocaleDateString('ar-SA');
+        }
+
+        // حساب الأيام المتبقية
+        function getDaysRemaining(dueDate) {
+            const now = new Date();
+            const due = new Date(dueDate);
+            const diffTime = due - now;
+            const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+            return diffDays;
+        }
+
+        // تصنيف حالة التطعيم
+        function getVaccineStatus(vaccine) {
+            if (vaccine.status === 'مكتمل') return 'completed';
+            if (vaccine.status === 'ملغي') return 'cancelled';
+            
+            const daysRemaining = getDaysRemaining(vaccine.dueDate);
+            if (daysRemaining <= 7 && daysRemaining >= 0) return 'upcoming';
+            return 'pending';
+        }
+
+        // جلب بيانات الطفل
+        async function fetchChildData(phone) {
+            try {
+                showLoading();
+                
+                const response = await fetch(`/api/mother/${phone}`);
+                const data = await response.json();
+                
+                if (data.success) {
+                    hideError();
+                    displayChildData(data);
+                } else {
+                    showError(data.error || 'حدث خطأ غير متوقع');
+                }
+            } catch (error) {
+                console.error('خطأ في جلب البيانات:', error);
+                showError('تعذر الاتصال بالسيرفر. حاول مرة أخرى.');
+                
+                // بيانات تجريبية للعرض
+                displaySampleData();
+            }
+        }
+
+        // عرض بيانات الطفل
+        function displayChildData(data) {
+            const { patient, vaccines, stats, hospital } = data;
+            
+            // معلومات الطفل
+            childName.textContent = patient.childName;
+            motherName.textContent = patient.motherName;
+            birthDate.textContent = formatDate(patient.birthDate);
+            gender.textContent = patient.gender;
+            
+            // الإحصائيات
+            statsContainer.innerHTML = `
+                <div class="stat-item">
+                    <div class="stat-number">${stats.totalVaccines}</div>
+                    <div class="stat-label">إجمالي التطعيمات</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-number">${stats.completedVaccines}</div>
+                    <div class="stat-label">مكتملة</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-number">${stats.pendingVaccines}</div>
+                    <div class="stat-label">معلقة</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-number">${stats.completionRate}%</div>
+                    <div class="stat-label">نسبة الإنجاز</div>
+                </div>
+            `;
+            
+            // فصل التطعيمات القادمة
+            const upcomingVaccines = vaccines.filter(v => 
+                getVaccineStatus(v) === 'upcoming' && v.status === 'معلق'
+            );
+            
+            const otherVaccines = vaccines.filter(v => 
+                getVaccineStatus(v) !== 'upcoming' || v.status !== 'معلق'
+            );
+            
+            // عرض التطعيمات القادمة
+            if (upcomingVaccines.length > 0) {
+                let upcomingHTML = '';
+                upcomingVaccines.forEach(vaccine => {
+                    const daysRemaining = getDaysRemaining(vaccine.dueDate);
+                    upcomingHTML += createVaccineCard(vaccine, daysRemaining);
+                });
+                upcomingList.innerHTML = upcomingHTML;
+                document.getElementById('upcomingVaccines').style.display = 'block';
+            } else {
+                document.getElementById('upcomingVaccines').style.display = 'none';
+            }
+            
+            // عرض جميع التطعيمات
+            let vaccinesHTML = '';
+            otherVaccines.forEach(vaccine => {
+                const daysRemaining = getDaysRemaining(vaccine.dueDate);
+                vaccinesHTML += createVaccineCard(vaccine, daysRemaining);
+            });
+            vaccinesList.innerHTML = vaccinesHTML;
+            
+            // معلومات المستشفى
+            if (hospital) {
+                document.getElementById('hospitalName').textContent = `المستشفى: ${hospital.name}`;
+                document.getElementById('hospitalPhone').textContent = `الهاتف: ${hospital.phone || 'غير متوفر'}`;
+                document.getElementById('hospitalAddress').textContent = `العنوان: ${hospital.address || 'غير متوفر'}`;
+                hospitalInfo.style.display = 'block';
+            } else {
+                hospitalInfo.style.display = 'none';
+            }
+            
+            // إظهار المحتوى
+            childContent.style.display = 'block';
+        }
+
+        // إنشاء بطاقة تطعيم
+        function createVaccineCard(vaccine, daysRemaining) {
+            const status = getVaccineStatus(vaccine);
+            const statusText = {
+                'completed': 'مكتمل',
+                'pending': 'معلق',
+                'upcoming': 'قادم',
+                'cancelled': 'ملغي'
+            }[status];
+            
+            const statusClass = {
+                'completed': 'status-completed',
+                'pending': 'status-pending',
+                'upcoming': 'status-upcoming',
+                'cancelled': 'status-pending'
+            }[status];
+            
+            const cardClass = {
+                'completed': 'completed',
+                'pending': 'pending',
+                'upcoming': 'upcoming',
+                'cancelled': 'pending'
+            }[status];
+            
+            let statusHTML = '';
+            if (status === 'upcoming') {
+                statusHTML = `<span class="vaccine-status ${statusClass}">قادم خلال ${daysRemaining} أيام</span>`;
+            } else {
+                statusHTML = `<span class="vaccine-status ${statusClass}">${statusText}</span>`;
+            }
+            
+            let completedDateHTML = '';
+            if (vaccine.completedDate) {
+                completedDateHTML = `
+                    <div class="detail-item">
+                        <i class="fas fa-calendar-check"></i>
+                        <span>تاريخ الإنجاز: ${formatShortDate(vaccine.completedDate)}</span>
+                    </div>
+                `;
+            }
+            
+            let notesHTML = '';
+            if (vaccine.notes) {
+                notesHTML = `
+                    <div class="detail-item">
+                        <i class="fas fa-sticky-note"></i>
+                        <span>ملاحظات: ${vaccine.notes}</span>
+                    </div>
+                `;
+            }
+            
+            return `
+                <div class="vaccine-card ${cardClass}">
+                    <div class="vaccine-header">
+                        <div class="vaccine-name">${vaccine.name}</div>
+                        ${statusHTML}
+                    </div>
+                    <div class="vaccine-details">
+                        <div class="detail-item">
+                            <i class="fas fa-calendar-alt"></i>
+                            <span>تاريخ الاستحقاق: ${formatShortDate(vaccine.dueDate)}</span>
+                        </div>
+                        ${completedDateHTML}
+                        ${notesHTML}
+                    </div>
+                </div>
+            `;
+        }
+
+        // بيانات تجريبية للعرض
+        function displaySampleData() {
+            const sampleData = {
+                patient: {
+                    childName: 'أحمد محمد',
+                    motherName: 'فاطمة أحمد',
+                    birthDate: '2024-01-15',
+                    gender: 'ذكر'
+                },
+                stats: {
+                    totalVaccines: 8,
+                    completedVaccines: 5,
+                    pendingVaccines: 3,
+                    completionRate: 63
+                },
+                vaccines: [
+                    {
+                        name: 'اللقاح الثلاثي البكتيري',
+                        dueDate: '2024-03-15',
+                        status: 'مكتمل',
+                        completedDate: '2024-03-14',
+                        notes: 'تمت بدون مضاعفات'
+                    },
+                    {
+                        name: 'شلل الأطفال الفموي',
+                        dueDate: '2024-03-15',
+                        status: 'مكتمل',
+                        completedDate: '2024-03-14'
+                    },
+                    {
+                        name: 'المستدمية النزلية',
+                        dueDate: '2024-05-15',
+                        status: 'معلق'
+                    },
+                    {
+                        name: 'اللقاح الثلاثي البكتيري',
+                        dueDate: '2024-07-15',
+                        status: 'معلق'
+                    }
+                ],
+                hospital: {
+                    name: 'مستشفى الأمومة والطفولة',
+                    phone: '0123456789',
+                    address: 'الرياض - حي الملقا'
+                }
+            };
+            
+            displayChildData(sampleData);
+        }
+
+        // إظهار رسالة التحميل
+        function showLoading() {
+            searchBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> جاري البحث...';
+            searchBtn.disabled = true;
+        }
+
+        // إخفاء رسالة التحميل
+        function hideLoading() {
+            searchBtn.innerHTML = '<i class="fas fa-search"></i> عرض التطعيمات';
+            searchBtn.disabled = false;
+        }
+
+        // إظهار رسالة الخطأ
+        function showError(message) {
+            errorText.textContent = message;
+            errorMessage.style.display = 'block';
+            childContent.style.display = 'none';
+            hideLoading();
+        }
+
+        // إخفاء رسالة الخطأ
+        function hideError() {
+            errorMessage.style.display = 'none';
+            hideLoading();
+        }
+
+        // إعداد مستمعي الأحداث
+        searchBtn.addEventListener('click', () => {
+            const phone = phoneInput.value.trim();
+            
+            if (!phone) {
+                showError('يرجى إدخال رقم الهاتف');
+                return;
+            }
+            
+            if (!/^\d{10}$/.test(phone)) {
+                showError('يرجى إدخال رقم هاتف صحيح (10 أرقام)');
+                return;
+            }
+            
+            fetchChildData(phone);
+        });
+
+        phoneInput.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') {
+                searchBtn.click();
+            }
+        });
+
+        // تهيئة الصفحة
+        document.addEventListener('DOMContentLoaded', () => {
+            // التحقق إذا كان هناك رقم هاتف في الرابط
+            const urlParams = new URLSearchParams(window.location.search);
+            const phoneFromUrl = urlParams.get('phone');
+            
+            if (phoneFromUrl) {
+                phoneInput.value = phoneFromUrl;
+                setTimeout(() => {
+                    searchBtn.click();
+                }, 500);
+            }
+        });
+    </script>
+</body>
+</html>
