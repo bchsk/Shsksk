@@ -1,0 +1,797 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>قائمة المرضى</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: #f5f7fa;
+            min-height: 100vh;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        /* الهيدر */
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2rem;
+            background: white;
+            padding: 1.5rem;
+            border-radius: 15px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+
+        .header h1 {
+            color: #333;
+            font-size: 1.8rem;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .header-actions {
+            display: flex;
+            gap: 1rem;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+
+        .btn {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 10px;
+            cursor: pointer;
+            font-size: 1rem;
+            font-weight: 600;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            transition: all 0.3s;
+            text-decoration: none;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.3);
+        }
+
+        .btn-secondary {
+            background: #6c757d;
+        }
+
+        /* شريط البحث والتصفية */
+        .filters-bar {
+            background: white;
+            padding: 1.5rem;
+            border-radius: 15px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+            margin-bottom: 2rem;
+        }
+
+        .search-box {
+            display: flex;
+            gap: 1rem;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+
+        .input-with-icon {
+            position: relative;
+            flex: 1;
+            min-width: 250px;
+        }
+
+        .input-with-icon input {
+            width: 100%;
+            padding: 12px 45px 12px 15px;
+            border: 2px solid #e0e0e0;
+            border-radius: 10px;
+            font-size: 1rem;
+            transition: all 0.3s;
+            background: #f8f9fa;
+        }
+
+        .input-with-icon input:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+
+        .input-with-icon i {
+            position: absolute;
+            left: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #999;
+        }
+
+        /* جدول المرضى */
+        .patients-table {
+            background: white;
+            border-radius: 15px;
+            overflow: hidden;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+            margin-bottom: 2rem;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        thead {
+            background: #f8f9fa;
+        }
+
+        th {
+            padding: 1.2rem;
+            text-align: right;
+            color: #667eea;
+            font-weight: 600;
+            border-bottom: 2px solid #eee;
+            cursor: pointer;
+            user-select: none;
+            transition: background 0.3s;
+        }
+
+        th:hover {
+            background: #f0f0f0;
+        }
+
+        th.sort-asc i,
+        th.sort-desc i {
+            margin-right: 5px;
+        }
+
+        td {
+            padding: 1rem 1.2rem;
+            border-bottom: 1px solid #eee;
+        }
+
+        tbody tr {
+            transition: background 0.3s;
+        }
+
+        tbody tr:hover {
+            background: #f8f9fa;
+        }
+
+        .patient-info {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .patient-avatar {
+            width: 40px;
+            height: 40px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 1.2rem;
+        }
+
+        .patient-details h4 {
+            color: #333;
+            margin-bottom: 2px;
+        }
+
+        .patient-details p {
+            color: #666;
+            font-size: 0.9rem;
+        }
+
+        .gender-badge {
+            padding: 5px 12px;
+            border-radius: 15px;
+            font-size: 0.85rem;
+            font-weight: 500;
+        }
+
+        .gender-male {
+            background: #d1ecf1;
+            color: #0c5460;
+        }
+
+        .gender-female {
+            background: #f8d7da;
+            color: #721c24;
+        }
+
+        .action-buttons {
+            display: flex;
+            gap: 8px;
+        }
+
+        .btn-small {
+            padding: 6px 12px;
+            font-size: 0.85rem;
+            border-radius: 8px;
+        }
+
+        .btn-view {
+            background: #17a2b8;
+        }
+
+        .btn-edit {
+            background: #ffc107;
+            color: #333;
+        }
+
+        .btn-delete {
+            background: #dc3545;
+        }
+
+        /* الترقيم */
+        .pagination {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            margin-top: 2rem;
+            flex-wrap: wrap;
+        }
+
+        .pagination button {
+            padding: 8px 15px;
+            border: 1px solid #ddd;
+            background: white;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .pagination button:hover {
+            background: #f0f0f0;
+        }
+
+        .pagination button.active {
+            background: #667eea;
+            color: white;
+            border-color: #667eea;
+        }
+
+        .pagination button:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        /* حالة عدم وجود بيانات */
+        .empty-state {
+            text-align: center;
+            padding: 3rem;
+            color: #666;
+        }
+
+        .empty-state i {
+            font-size: 4rem;
+            color: #ddd;
+            margin-bottom: 1rem;
+        }
+
+        /* رسائل */
+        .message {
+            padding: 15px;
+            border-radius: 10px;
+            margin-bottom: 1.5rem;
+            text-align: center;
+            display: none;
+        }
+
+        .message.error {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+
+        .message.success {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+
+        /* تصميم متجاوب */
+        @media (max-width: 768px) {
+            .container {
+                padding: 10px;
+            }
+
+            .header {
+                flex-direction: column;
+                text-align: center;
+            }
+
+            .header-actions {
+                justify-content: center;
+            }
+
+            table {
+                display: block;
+                overflow-x: auto;
+            }
+
+            .action-buttons {
+                flex-direction: column;
+            }
+
+            .btn-small {
+                width: 100%;
+                justify-content: center;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .search-box {
+                flex-direction: column;
+            }
+
+            .input-with-icon {
+                min-width: 100%;
+            }
+        }
+
+        /* أنيميشن */
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .fade-in {
+            animation: fadeIn 0.3s ease-out;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- الرأس -->
+        <div class="header">
+            <h1><i class="fas fa-users"></i> قائمة المرضى</h1>
+            <div class="header-actions">
+                <a href="hospital-dashboard.html" class="btn btn-secondary">
+                    <i class="fas fa-arrow-right"></i>
+                    العودة للوحة التحكم
+                </a>
+                <a href="add-patient.html" class="btn">
+                    <i class="fas fa-user-plus"></i>
+                    إضافة طفل جديد
+                </a>
+            </div>
+        </div>
+
+        <!-- رسائل -->
+        <div class="message error" id="errorMessage">
+            <i class="fas fa-exclamation-circle"></i>
+            <span id="errorText"></span>
+        </div>
+
+        <div class="message success" id="successMessage">
+            <i class="fas fa-check-circle"></i>
+            <span id="successText"></span>
+        </div>
+
+        <!-- شريط البحث -->
+        <div class="filters-bar fade-in">
+            <div class="search-box">
+                <div class="input-with-icon">
+                    <input 
+                        type="text" 
+                        id="searchInput" 
+                        placeholder="ابحث عن طفل أو أم..."
+                    >
+                    <i class="fas fa-search"></i>
+                </div>
+                <button class="btn" id="searchBtn">
+                    <i class="fas fa-search"></i>
+                    بحث
+                </button>
+                <button class="btn btn-secondary" id="resetBtn">
+                    <i class="fas fa-redo"></i>
+                    إعادة تعيين
+                </button>
+            </div>
+        </div>
+
+        <!-- جدول المرضى -->
+        <div class="patients-table fade-in" style="animation-delay: 0.1s">
+            <div id="patientsContainer">
+                <!-- سيتم تعبئتها بالجافاسكريبت -->
+            </div>
+        </div>
+
+        <!-- الترقيم -->
+        <div class="pagination" id="pagination">
+            <!-- سيتم تعبئتها بالجافاسكريبت -->
+        </div>
+    </div>
+
+    <script>
+        // عناصر DOM
+        const searchInput = document.getElementById('searchInput');
+        const searchBtn = document.getElementById('searchBtn');
+        const resetBtn = document.getElementById('resetBtn');
+        const patientsContainer = document.getElementById('patientsContainer');
+        const pagination = document.getElementById('pagination');
+        const errorMessage = document.getElementById('errorMessage');
+        const errorText = document.getElementById('errorText');
+        const successMessage = document.getElementById('successMessage');
+        const successText = document.getElementById('successText');
+
+        // متغيرات
+        let patientsData = [];
+        let currentPage = 1;
+        let itemsPerPage = 10;
+        let totalPages = 1;
+        let searchTerm = '';
+        let sortField = 'createdAt';
+        let sortOrder = 'desc';
+
+        // تهيئة الصفحة
+        document.addEventListener('DOMContentLoaded', function() {
+            checkAuth();
+            loadPatients();
+            setupEventListeners();
+        });
+
+        // التحقق من المصادقة
+        function checkAuth() {
+            const token = localStorage.getItem('hospitalToken');
+            if (!token) {
+                window.location.href = 'hospital-login.html';
+            }
+        }
+
+        // تحميل المرضى
+        async function loadPatients() {
+            try {
+                showLoading();
+                
+                const token = localStorage.getItem('hospitalToken');
+                const params = new URLSearchParams({
+                    page: currentPage,
+                    limit: itemsPerPage,
+                    search: searchTerm,
+                    sort: sortField,
+                    order: sortOrder
+                });
+
+                const response = await fetch(`/api/patients?${params}`, {
+                    headers: {
+                        'Authorization': `Bearer ${token}`
+                    }
+                });
+
+                const data = await response.json();
+                
+                if (data.success) {
+                    patientsData = data.patients;
+                    totalPages = data.pagination.pages;
+                    displayPatients();
+                    displayPagination();
+                } else {
+                    throw new Error(data.error || 'فشل في جلب البيانات');
+                }
+            } catch (error) {
+                console.error('خطأ في تحميل المرضى:', error);
+                showError('حدث خطأ في جلب البيانات');
+                
+                // بيانات تجريبية للعرض
+                loadSampleData();
+            }
+        }
+
+        // عرض المرضى
+        function displayPatients() {
+            if (patientsData.length === 0) {
+                patientsContainer.innerHTML = `
+                    <div class="empty-state">
+                        <i class="fas fa-user-slash"></i>
+                        <h3>لا توجد بيانات</h3>
+                        <p>${searchTerm ? 'لا توجد نتائج للبحث' : 'لم يتم إضافة أي مرضى بعد'}</p>
+                        ${!searchTerm ? '<a href="add-patient.html" class="btn" style="margin-top: 1rem;">إضافة أول طفل</a>' : ''}
+                    </div>
+                `;
+                return;
+            }
+
+            let html = `
+                <table>
+                    <thead>
+                        <tr>
+                            <th onclick="sortTable('childName')">
+                                اسم الطفل
+                                ${sortField === 'childName' ? `<i class="fas fa-sort-${sortOrder === 'asc' ? 'up' : 'down'}"></i>` : '<i class="fas fa-sort"></i>'}
+                            </th>
+                            <th onclick="sortTable('motherName')">
+                                اسم الأم
+                                ${sortField === 'motherName' ? `<i class="fas fa-sort-${sortOrder === 'asc' ? 'up' : 'down'}"></i>` : '<i class="fas fa-sort"></i>'}
+                            </th>
+                            <th onclick="sortTable('motherPhone')">
+                                رقم الهاتف
+                                ${sortField === 'motherPhone' ? `<i class="fas fa-sort-${sortOrder === 'asc' ? 'up' : 'down'}"></i>` : '<i class="fas fa-sort"></i>'}
+                            </th>
+                            <th onclick="sortTable('birthDate')">
+                                تاريخ الميلاد
+                                ${sortField === 'birthDate' ? `<i class="fas fa-sort-${sortOrder === 'asc' ? 'up' : 'down'}"></i>` : '<i class="fas fa-sort"></i>'}
+                            </th>
+                            <th onclick="sortTable('gender')">
+                                الجنس
+                                ${sortField === 'gender' ? `<i class="fas fa-sort-${sortOrder === 'asc' ? 'up' : 'down'}"></i>` : '<i class="fas fa-sort"></i>'}
+                            </th>
+                            <th>الإجراءات</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+            `;
+
+            patientsData.forEach(patient => {
+                const birthDate = new Date(patient.birthDate);
+                const formattedDate = birthDate.toLocaleDateString('ar-SA');
+                const genderClass = patient.gender === 'ذكر' ? 'gender-male' : 'gender-female';
+                const genderIcon = patient.gender === 'ذكر' ? 'mars' : 'venus';
+                
+                html += `
+                    <tr class="fade-in">
+                        <td>
+                            <div class="patient-info">
+                                <div class="patient-avatar">
+                                    <i class="fas fa-child"></i>
+                                </div>
+                                <div class="patient-details">
+                                    <h4>${patient.childName}</h4>
+                                    <p>رقم السجل: ${patient._id.substring(0, 8)}</p>
+                                </div>
+                            </div>
+                        </td>
+                        <td>${patient.motherName || 'غير محدد'}</td>
+                        <td>${patient.motherPhone}</td>
+                        <td>${formattedDate}</td>
+                        <td>
+                            <span class="gender-badge ${genderClass}">
+                                <i class="fas fa-${genderIcon}"></i>
+                                ${patient.gender || 'غير محدد'}
+                            </span>
+                        </td>
+                        <td>
+                            <div class="action-buttons">
+                                <a href="patient-detail.html?id=${patient._id}" class="btn btn-small btn-view">
+                                    <i class="fas fa-eye"></i>
+                                    عرض
+                                </a>
+                                <button class="btn btn-small btn-edit" onclick="editPatient('${patient._id}')">
+                                    <i class="fas fa-edit"></i>
+                                    تعديل
+                                </button>
+                                <button class="btn btn-small btn-delete" onclick="deletePatient('${patient._id}', '${patient.childName}')">
+                                    <i class="fas fa-trash"></i>
+                                    حذف
+                                </button>
+                            </div>
+                        </td>
+                    </tr>
+                `;
+            });
+
+            html += '</tbody></table>';
+            patientsContainer.innerHTML = html;
+        }
+
+        // عرض الترقيم
+        function displayPagination() {
+            if (totalPages <= 1) {
+                pagination.innerHTML = '';
+                return;
+            }
+
+            let html = '';
+
+            // زر السابق
+            html += `
+                <button onclick="changePage(${currentPage - 1})" ${currentPage === 1 ? 'disabled' : ''}>
+                    <i class="fas fa-chevron-right"></i>
+                </button>
+            `;
+
+            // أرقام الصفحات
+            const maxPagesToShow = 5;
+            let startPage = Math.max(1, currentPage - Math.floor(maxPagesToShow / 2));
+            let endPage = Math.min(totalPages, startPage + maxPagesToShow - 1);
+
+            if (endPage - startPage + 1 < maxPagesToShow) {
+                startPage = Math.max(1, endPage - maxPagesToShow + 1);
+            }
+
+            for (let i = startPage; i <= endPage; i++) {
+                html += `
+                    <button onclick="changePage(${i})" ${i === currentPage ? 'class="active"' : ''}>
+                        ${i}
+                    </button>
+                `;
+            }
+
+            // زر التالي
+            html += `
+                <button onclick="changePage(${currentPage + 1})" ${currentPage === totalPages ? 'disabled' : ''}>
+                    <i class="fas fa-chevron-left"></i>
+                </button>
+            `;
+
+            pagination.innerHTML = html;
+        }
+
+        // تغيير الصفحة
+        function changePage(page) {
+            if (page < 1 || page > totalPages || page === currentPage) return;
+            
+            currentPage = page;
+            loadPatients();
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        // ترتيب الجدول
+        function sortTable(field) {
+            if (sortField === field) {
+                sortOrder = sortOrder === 'asc' ? 'desc' : 'asc';
+            } else {
+                sortField = field;
+                sortOrder = 'desc';
+            }
+            
+            currentPage = 1;
+            loadPatients();
+        }
+
+        // البحث
+        function searchPatients() {
+            searchTerm = searchInput.value.trim();
+            currentPage = 1;
+            loadPatients();
+        }
+
+        // إعادة تعيين البحث
+        function resetSearch() {
+            searchInput.value = '';
+            searchTerm = '';
+            currentPage = 1;
+            loadPatients();
+        }
+
+        // تحرير المريض
+        function editPatient(patientId) {
+            // هنا يمكن إضافة نافذة تحرير أو توجيه لصفحة التحرير
+            alert(`تحرير المريض ${patientId}`);
+            // window.location.href = `edit-patient.html?id=${patientId}`;
+        }
+
+        // حذف المريض
+        async function deletePatient(patientId, patientName) {
+            if (!confirm(`هل أنت متأكد من حذف ${patientName}؟`)) {
+                return;
+            }
+
+            try {
+                const token = localStorage.getItem('hospitalToken');
+                const response = await fetch(`/api/patients/${patientId}`, {
+                    method: 'DELETE',
+                    headers: {
+                        'Authorization': `Bearer ${token}`
+                    }
+                });
+
+                const data = await response.json();
+                
+                if (data.success) {
+                    showSuccess(`تم حذف ${patientName} بنجاح`);
+                    loadPatients();
+                } else {
+                    throw new Error(data.error || 'فشل في الحذف');
+                }
+            } catch (error) {
+                showError(error.message);
+            }
+        }
+
+        // بيانات تجريبية
+        function loadSampleData() {
+            patientsData = [
+                {
+                    _id: '1',
+                    childName: 'محمد أحمد',
+                    motherName: 'فاطمة محمد',
+                    motherPhone: '0555555555',
+                    birthDate: '2024-01-15',
+                    gender: 'ذكر'
+                },
+                {
+                    _id: '2',
+                    childName: 'نورة سعيد',
+                    motherName: 'سعاد أحمد',
+                    motherPhone: '0555555556',
+                    birthDate: '2024-02-20',
+                    gender: 'أنثى'
+                },
+                {
+                    _id: '3',
+                    childName: 'عبدالله خالد',
+                    motherName: 'منى عبدالله',
+                    motherPhone: '0555555557',
+                    birthDate: '2024-03-10',
+                    gender: 'ذكر'
+                }
+            ];
+            
+            totalPages = 1;
+            displayPatients();
+            displayPagination();
+        }
+
+        // إظهار حالة التحميل
+        function showLoading() {
+            patientsContainer.innerHTML = `
+                <div class="empty-state">
+                    <i class="fas fa-spinner fa-spin"></i>
+                    <h3>جاري تحميل البيانات...</h3>
+                </div>
+            `;
+            pagination.innerHTML = '';
+        }
+
+        // إظهار رسالة الخطأ
+        function showError(message) {
+            errorText.textContent = message;
+            errorMessage.style.display = 'block';
+            successMessage.style.display = 'none';
+        }
+
+        // إظهار رسالة النجاح
+        function showSuccess(message) {
+            successText.textContent = message;
+            successMessage.style.display = 'block';
+            errorMessage.style.display = 'none';
+            
+            setTimeout(() => {
+                successMessage.style.display = 'none';
+            }, 3000);
+        }
+
+        // إعداد مستمعي الأحداث
+        function setupEventListeners() {
+            searchBtn.addEventListener('click', searchPatients);
+            resetBtn.addEventListener('click', resetSearch);
+            
+            searchInput.addEventListener('keypress', function(e) {
+                if (e.key === 'Enter') {
+                    searchPatients();
+                }
+            });
+            
+            // البحث أثناء الكتابة (مع تأخير)
+            let searchTimeout;
+            searchInput.addEventListener('input', function() {
+                clearTimeout(searchTimeout);
+                searchTimeout = setTimeout(searchPatients, 500);
+            });
+        }
+    </script>
+</body>
+</html>
