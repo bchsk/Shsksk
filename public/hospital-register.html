@@ -1,0 +1,958 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>تسجيل مستشفى جديد</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .register-container {
+            width: 100%;
+            max-width: 500px;
+        }
+
+        .register-card {
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            overflow: hidden;
+            animation: slideIn 0.5s ease-out;
+        }
+
+        .register-header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 2.5rem;
+            text-align: center;
+            position: relative;
+        }
+
+        .register-header::after {
+            content: '';
+            position: absolute;
+            bottom: -20px;
+            left: 0;
+            right: 0;
+            height: 40px;
+            background: white;
+            border-radius: 20px 20px 0 0;
+        }
+
+        .logo {
+            font-size: 3.5rem;
+            margin-bottom: 1rem;
+            position: relative;
+            z-index: 1;
+        }
+
+        .register-header h1 {
+            font-size: 1.8rem;
+            margin-bottom: 0.5rem;
+            position: relative;
+            z-index: 1;
+        }
+
+        .register-header p {
+            opacity: 0.9;
+            position: relative;
+            z-index: 1;
+        }
+
+        .register-form {
+            padding: 2.5rem;
+            padding-top: 3rem;
+            position: relative;
+            z-index: 2;
+        }
+
+        .form-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1rem;
+            margin-bottom: 1rem;
+        }
+
+        .input-group {
+            margin-bottom: 1.5rem;
+        }
+
+        .input-group.full-width {
+            grid-column: 1 / -1;
+        }
+
+        .input-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            color: #555;
+            font-weight: 500;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .required {
+            color: #e74c3c;
+            margin-right: 5px;
+        }
+
+        .input-with-icon {
+            position: relative;
+        }
+
+        .input-with-icon input,
+        .input-with-icon textarea {
+            width: 100%;
+            padding: 15px 50px 15px 15px;
+            border: 2px solid #e0e0e0;
+            border-radius: 10px;
+            font-size: 1rem;
+            transition: all 0.3s;
+            background: #f8f9fa;
+            font-family: inherit;
+        }
+
+        .input-with-icon textarea {
+            min-height: 100px;
+            resize: vertical;
+        }
+
+        .input-with-icon input:focus,
+        .input-with-icon textarea:focus {
+            outline: none;
+            border-color: #667eea;
+            background: white;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+
+        .input-with-icon i {
+            position: absolute;
+            left: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #999;
+            transition: color 0.3s;
+        }
+
+        .input-with-icon textarea + i {
+            top: 20px;
+            transform: none;
+        }
+
+        .input-with-icon input:focus + i,
+        .input-with-icon textarea:focus + i {
+            color: #667eea;
+        }
+
+        .password-strength {
+            height: 5px;
+            background: #e0e0e0;
+            border-radius: 5px;
+            margin-top: 5px;
+            overflow: hidden;
+        }
+
+        .strength-bar {
+            height: 100%;
+            width: 0;
+            background: #e74c3c;
+            transition: all 0.3s;
+            border-radius: 5px;
+        }
+
+        .strength-weak .strength-bar {
+            width: 25%;
+            background: #e74c3c;
+        }
+
+        .strength-fair .strength-bar {
+            width: 50%;
+            background: #f39c12;
+        }
+
+        .strength-good .strength-bar {
+            width: 75%;
+            background: #f1c40f;
+        }
+
+        .strength-strong .strength-bar {
+            width: 100%;
+            background: #2ecc71;
+        }
+
+        .password-requirements {
+            margin-top: 5px;
+            font-size: 0.85rem;
+            color: #666;
+        }
+
+        .requirement {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            margin-bottom: 3px;
+        }
+
+        .requirement i {
+            font-size: 0.75rem;
+        }
+
+        .requirement.valid {
+            color: #27ae60;
+        }
+
+        .requirement.invalid {
+            color: #e74c3c;
+        }
+
+        .btn {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 16px;
+            border-radius: 10px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            cursor: pointer;
+            width: 100%;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            margin-top: 1.5rem;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.3);
+        }
+
+        .btn:disabled {
+            opacity: 0.7;
+            cursor: not-allowed;
+            transform: none !important;
+        }
+
+        .links {
+            text-align: center;
+            margin-top: 1.5rem;
+            padding-top: 1.5rem;
+            border-top: 1px solid #eee;
+        }
+
+        .links a {
+            color: #667eea;
+            text-decoration: none;
+            font-weight: 500;
+            transition: color 0.3s;
+        }
+
+        .links a:hover {
+            color: #764ba2;
+            text-decoration: underline;
+        }
+
+        .message {
+            padding: 15px;
+            border-radius: 10px;
+            margin-bottom: 1.5rem;
+            text-align: center;
+            display: none;
+        }
+
+        .message.error {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+
+        .message.success {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+
+        .form-progress {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 2rem;
+            position: relative;
+        }
+
+        .progress-step {
+            width: 30px;
+            height: 30px;
+            background: #e0e0e0;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            color: white;
+            position: relative;
+            z-index: 1;
+        }
+
+        .progress-step.active {
+            background: #667eea;
+        }
+
+        .progress-step.completed {
+            background: #2ecc71;
+        }
+
+        .progress-line {
+            position: absolute;
+            top: 50%;
+            left: 30px;
+            right: 30px;
+            height: 3px;
+            background: #e0e0e0;
+            transform: translateY(-50%);
+        }
+
+        .progress-fill {
+            position: absolute;
+            top: 50%;
+            left: 30px;
+            height: 3px;
+            background: #667eea;
+            transform: translateY(-50%);
+            transition: width 0.3s;
+        }
+
+        .form-step {
+            display: none;
+        }
+
+        .form-step.active {
+            display: block;
+            animation: fadeIn 0.5s ease-out;
+        }
+
+        .step-actions {
+            display: flex;
+            gap: 1rem;
+            margin-top: 2rem;
+        }
+
+        .step-actions .btn-secondary {
+            background: #95a5a6;
+        }
+
+        /* أنيميشن */
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateX(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+            100% { transform: scale(1); }
+        }
+
+        .pulse {
+            animation: pulse 0.5s;
+        }
+
+        /* تصميم متجاوب */
+        @media (max-width: 768px) {
+            .form-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .register-form {
+                padding: 2rem;
+            }
+
+            .register-header {
+                padding: 2rem;
+            }
+
+            .logo {
+                font-size: 3rem;
+            }
+
+            .register-header h1 {
+                font-size: 1.5rem;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .register-container {
+                padding: 0;
+            }
+
+            .register-card {
+                border-radius: 0;
+                min-height: 100vh;
+            }
+
+            .step-actions {
+                flex-direction: column;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="register-container">
+        <div class="register-card">
+            <div class="register-header">
+                <div class="logo">
+                    <i class="fas fa-hospital-alt"></i>
+                </div>
+                <h1>تسجيل مستشفى جديد</h1>
+                <p>أنشئ حساباً لإدارة تطعيمات الأطفال بسهولة</p>
+            </div>
+
+            <div class="register-form">
+                <!-- مؤشر التقدم -->
+                <div class="form-progress">
+                    <div class="progress-step active" id="step1">1</div>
+                    <div class="progress-step" id="step2">2</div>
+                    <div class="progress-line">
+                        <div class="progress-fill" id="progressFill" style="width: 0%"></div>
+                    </div>
+                </div>
+
+                <!-- رسالة الخطأ -->
+                <div class="message error" id="errorMessage">
+                    <i class="fas fa-exclamation-circle"></i>
+                    <span id="errorText"></span>
+                </div>
+
+                <!-- رسالة النجاح -->
+                <div class="message success" id="successMessage">
+                    <i class="fas fa-check-circle"></i>
+                    <span id="successText"></span>
+                </div>
+
+                <!-- الخطوة 1: المعلومات الأساسية -->
+                <div class="form-step active" id="step1Form">
+                    <form id="basicInfoForm">
+                        <div class="form-grid">
+                            <div class="input-group">
+                                <label for="name">
+                                    <i class="fas fa-hospital"></i>
+                                    <span class="required">*</span>اسم المستشفى
+                                </label>
+                                <div class="input-with-icon">
+                                    <input 
+                                        type="text" 
+                                        id="name" 
+                                        placeholder="مثال: مستشفى الأمومة"
+                                        required
+                                    >
+                                    <i class="fas fa-building"></i>
+                                </div>
+                            </div>
+
+                            <div class="input-group">
+                                <label for="phone">
+                                    <i class="fas fa-phone"></i>
+                                    <span class="required">*</span>رقم الهاتف
+                                </label>
+                                <div class="input-with-icon">
+                                    <input 
+                                        type="tel" 
+                                        id="phone" 
+                                        placeholder="مثال: 0555555555"
+                                        required
+                                        pattern="[0-9]{10}"
+                                    >
+                                    <i class="fas fa-mobile-alt"></i>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="input-group">
+                            <label for="email">
+                                <i class="fas fa-envelope"></i>
+                                <span class="required">*</span>البريد الإلكتروني
+                            </label>
+                            <div class="input-with-icon">
+                                <input 
+                                    type="email" 
+                                    id="email" 
+                                    placeholder="hospital@example.com"
+                                    required
+                                >
+                                <i class="fas fa-at"></i>
+                            </div>
+                        </div>
+
+                        <div class="input-group full-width">
+                            <label for="address">
+                                <i class="fas fa-map-marker-alt"></i>
+                                العنوان
+                            </label>
+                            <div class="input-with-icon">
+                                <textarea 
+                                    id="address" 
+                                    placeholder="العنوان التفصيلي للمستشفى"
+                                ></textarea>
+                                <i class="fas fa-location-dot"></i>
+                            </div>
+                        </div>
+
+                        <div class="step-actions">
+                            <button type="button" class="btn" id="nextBtn">
+                                التالي
+                                <i class="fas fa-arrow-left"></i>
+                            </button>
+                        </div>
+                    </form>
+                </div>
+
+                <!-- الخطوة 2: كلمة المرور -->
+                <div class="form-step" id="step2Form">
+                    <form id="passwordForm">
+                        <div class="form-grid">
+                            <div class="input-group">
+                                <label for="password">
+                                    <i class="fas fa-lock"></i>
+                                    <span class="required">*</span>كلمة المرور
+                                </label>
+                                <div class="input-with-icon">
+                                    <input 
+                                        type="password" 
+                                        id="password" 
+                                        placeholder="********"
+                                        required
+                                        minlength="6"
+                                    >
+                                    <i class="fas fa-key"></i>
+                                </div>
+                                <div class="password-strength" id="passwordStrength">
+                                    <div class="strength-bar"></div>
+                                </div>
+                                <div class="password-requirements" id="passwordRequirements">
+                                    <div class="requirement" id="reqLength">
+                                        <i class="fas fa-circle"></i>
+                                        <span>6 أحرف على الأقل</span>
+                                    </div>
+                                    <div class="requirement" id="reqNumber">
+                                        <i class="fas fa-circle"></i>
+                                        <span>رقم واحد على الأقل</span>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="input-group">
+                                <label for="confirmPassword">
+                                    <i class="fas fa-lock"></i>
+                                    <span class="required">*</span>تأكيد كلمة المرور
+                                </label>
+                                <div class="input-with-icon">
+                                    <input 
+                                        type="password" 
+                                        id="confirmPassword" 
+                                        placeholder="********"
+                                        required
+                                    >
+                                    <i class="fas fa-key"></i>
+                                </div>
+                                <div id="passwordMatch" style="margin-top: 5px;"></div>
+                            </div>
+                        </div>
+
+                        <div class="input-group full-width">
+                            <label>
+                                <i class="fas fa-file-contract"></i>
+                                الشروط والأحكام
+                            </label>
+                            <div style="padding: 15px; background: #f8f9fa; border-radius: 10px; max-height: 150px; overflow-y: auto;">
+                                <p style="margin-bottom: 10px;">بإنشاء حساب، أنت توافق على:</p>
+                                <ul style="padding-right: 20px; color: #666;">
+                                    <li style="margin-bottom: 5px;">استخدام النظام لأغراض طبية فقط</li>
+                                    <li style="margin-bottom: 5px;">حماية بيانات المرضى وخصوصيتهم</li>
+                                    <li style="margin-bottom: 5px;">تحديث البيانات بشكل دوري</li>
+                                    <li>التزام بالمعايير الطبية والقوانين المحلية</li>
+                                </ul>
+                            </div>
+                        </div>
+
+                        <div class="input-group full-width">
+                            <label style="display: flex; align-items: flex-start; gap: 10px; cursor: pointer;">
+                                <input type="checkbox" id="agreeTerms" style="margin-top: 3px;">
+                                <span>أوافق على الشروط والأحكام</span>
+                            </label>
+                        </div>
+
+                        <div class="step-actions">
+                            <button type="button" class="btn btn-secondary" id="backBtn">
+                                <i class="fas fa-arrow-right"></i>
+                                السابق
+                            </button>
+                            <button type="submit" class="btn" id="registerBtn">
+                                <i class="fas fa-user-plus"></i>
+                                إنشاء الحساب
+                            </button>
+                        </div>
+                    </form>
+                </div>
+
+                <div class="links">
+                    <p>
+                        لديك حساب بالفعل؟ 
+                        <a href="hospital-login.html">سجل دخول</a>
+                    </p>
+                    <p>
+                        <a href="index.html">العودة للصفحة الرئيسية</a>
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // عناصر DOM
+        const step1Form = document.getElementById('step1Form');
+        const step2Form = document.getElementById('step2Form');
+        const step1 = document.getElementById('step1');
+        const step2 = document.getElementById('step2');
+        const progressFill = document.getElementById('progressFill');
+        const nextBtn = document.getElementById('nextBtn');
+        const backBtn = document.getElementById('backBtn');
+        const registerBtn = document.getElementById('registerBtn');
+        const errorMessage = document.getElementById('errorMessage');
+        const errorText = document.getElementById('errorText');
+        const successMessage = document.getElementById('successMessage');
+        const successText = document.getElementById('successText');
+        
+        // حقول النموذج
+        const nameInput = document.getElementById('name');
+        const phoneInput = document.getElementById('phone');
+        const emailInput = document.getElementById('email');
+        const addressInput = document.getElementById('address');
+        const passwordInput = document.getElementById('password');
+        const confirmPasswordInput = document.getElementById('confirmPassword');
+        const agreeTerms = document.getElementById('agreeTerms');
+        const passwordStrength = document.getElementById('passwordStrength');
+        const passwordMatch = document.getElementById('passwordMatch');
+
+        // متغيرات
+        let currentStep = 1;
+        let hospitalData = {};
+
+        // تحديث مؤشر التقدم
+        function updateProgress() {
+            if (currentStep === 1) {
+                step1.classList.add('active');
+                step2.classList.remove('active');
+                progressFill.style.width = '0%';
+            } else {
+                step1.classList.add('completed');
+                step2.classList.add('active');
+                progressFill.style.width = '50%';
+            }
+        }
+
+        // الانتقال للخطوة التالية
+        nextBtn.addEventListener('click', function() {
+            // التحقق من صحة البيانات في الخطوة 1
+            if (!validateStep1()) {
+                return;
+            }
+
+            // حفظ البيانات
+            hospitalData = {
+                name: nameInput.value.trim(),
+                phone: phoneInput.value.trim(),
+                email: emailInput.value.trim(),
+                address: addressInput.value.trim()
+            };
+
+            // الانتقال للخطوة 2
+            currentStep = 2;
+            updateProgress();
+            step1Form.classList.remove('active');
+            step2Form.classList.add('active');
+            
+            // التركيز على حقل كلمة المرور
+            passwordInput.focus();
+        });
+
+        // العودة للخطوة السابقة
+        backBtn.addEventListener('click', function() {
+            currentStep = 1;
+            updateProgress();
+            step2Form.classList.remove('active');
+            step1Form.classList.add('active');
+        });
+
+        // التحقق من صحة الخطوة 1
+        function validateStep1() {
+            const name = nameInput.value.trim();
+            const phone = phoneInput.value.trim();
+            const email = emailInput.value.trim();
+
+            // التحقق من الاسم
+            if (!name) {
+                showError('يرجى إدخال اسم المستشفى');
+                nameInput.focus();
+                return false;
+            }
+
+            if (name.length < 3) {
+                showError('اسم المستشفى يجب أن يكون 3 أحرف على الأقل');
+                nameInput.focus();
+                return false;
+            }
+
+            // التحقق من الهاتف
+            if (!phone) {
+                showError('يرجى إدخال رقم الهاتف');
+                phoneInput.focus();
+                return false;
+            }
+
+            if (!/^\d{10}$/.test(phone)) {
+                showError('يرجى إدخال رقم هاتف صحيح (10 أرقام)');
+                phoneInput.focus();
+                return false;
+            }
+
+            // التحقق من البريد الإلكتروني
+            if (!email) {
+                showError('يرجى إدخال البريد الإلكتروني');
+                emailInput.focus();
+                return false;
+            }
+
+            if (!isValidEmail(email)) {
+                showError('يرجى إدخال بريد إلكتروني صحيح');
+                emailInput.focus();
+                return false;
+            }
+
+            hideError();
+            return true;
+        }
+
+        // التحقق من صحة البريد الإلكتروني
+        function isValidEmail(email) {
+            const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+            return emailRegex.test(email);
+        }
+
+        // فحص قوة كلمة المرور
+        function checkPasswordStrength(password) {
+            let strength = 0;
+            const requirements = {
+                length: password.length >= 6,
+                number: /\d/.test(password),
+                lowercase: /[a-z]/.test(password),
+                uppercase: /[A-Z]/.test(password),
+                special: /[^A-Za-z0-9]/.test(password)
+            };
+
+            // تحديث الرموز
+            document.getElementById('reqLength').className = requirements.length ? 
+                'requirement valid' : 'requirement invalid';
+            document.getElementById('reqLength').innerHTML = requirements.length ?
+                '<i class="fas fa-check-circle"></i><span>6 أحرف على الأقل</span>' :
+                '<i class="fas fa-times-circle"></i><span>6 أحرف على الأقل</span>';
+
+            document.getElementById('reqNumber').className = requirements.number ? 
+                'requirement valid' : 'requirement invalid';
+            document.getElementById('reqNumber').innerHTML = requirements.number ?
+                '<i class="fas fa-check-circle"></i><span>رقم واحد على الأقل</span>' :
+                '<i class="fas fa-times-circle"></i><span>رقم واحد على الأقل</span>';
+
+            // حساب القوة
+            if (requirements.length) strength++;
+            if (requirements.number) strength++;
+            if (requirements.lowercase) strength++;
+            if (requirements.uppercase) strength++;
+            if (requirements.special) strength++;
+
+            // تحديث شريط القوة
+            passwordStrength.className = 'password-strength';
+            if (strength <= 1) {
+                passwordStrength.classList.add('strength-weak');
+            } else if (strength <= 2) {
+                passwordStrength.classList.add('strength-fair');
+            } else if (strength <= 3) {
+                passwordStrength.classList.add('strength-good');
+            } else {
+                passwordStrength.classList.add('strength-strong');
+            }
+
+            return strength;
+        }
+
+        // فحص تطابق كلمة المرور
+        function checkPasswordMatch() {
+            const password = passwordInput.value;
+            const confirmPassword = confirmPasswordInput.value;
+
+            if (!confirmPassword) {
+                passwordMatch.innerHTML = '';
+                return false;
+            }
+
+            if (password === confirmPassword) {
+                passwordMatch.innerHTML = '<span style="color: #27ae60;"><i class="fas fa-check-circle"></i> كلمات المرور متطابقة</span>';
+                return true;
+            } else {
+                passwordMatch.innerHTML = '<span style="color: #e74c3c;"><i class="fas fa-times-circle"></i> كلمات المرور غير متطابقة</span>';
+                return false;
+            }
+        }
+
+        // إظهار رسالة الخطأ
+        function showError(message) {
+            errorText.textContent = message;
+            errorMessage.style.display = 'block';
+            successMessage.style.display = 'none';
+        }
+
+        // إخفاء رسالة الخطأ
+        function hideError() {
+            errorMessage.style.display = 'none';
+        }
+
+        // إظهار رسالة النجاح
+        function showSuccess(message) {
+            successText.textContent = message;
+            successMessage.style.display = 'block';
+            errorMessage.style.display = 'none';
+        }
+
+        // تسجيل المستشفى
+        async function registerHospital() {
+            try {
+                // التحقق من البيانات
+                if (!validateStep1()) {
+                    currentStep = 1;
+                    updateProgress();
+                    step2Form.classList.remove('active');
+                    step1Form.classList.add('active');
+                    return;
+                }
+
+                const password = passwordInput.value;
+                const confirmPassword = confirmPasswordInput.value;
+
+                if (!password || !confirmPassword) {
+                    showError('يرجى إدخال كلمة المرور وتأكيدها');
+                    return;
+                }
+
+                if (password.length < 6) {
+                    showError('كلمة المرور يجب أن تكون 6 أحرف على الأقل');
+                    passwordInput.focus();
+                    return;
+                }
+
+                if (password !== confirmPassword) {
+                    showError('كلمات المرور غير متطابقة');
+                    return;
+                }
+
+                if (!agreeTerms.checked) {
+                    showError('يجب الموافقة على الشروط والأحكام');
+                    return;
+                }
+
+                // إظهار حالة التحميل
+                registerBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> جاري إنشاء الحساب...';
+                registerBtn.disabled = true;
+
+                // إرسال طلب التسجيل
+                const response = await fetch('/api/hospitals/register', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        ...hospitalData,
+                        password: password
+                    })
+                });
+
+                const data = await response.json();
+
+                if (data.success) {
+                    showSuccess('تم إنشاء الحساب بنجاح! جاري التوجيه...');
+                    
+                    // حفظ التوكن وبيانات المستشفى
+                    localStorage.setItem('hospitalToken', data.token);
+                    localStorage.setItem('hospitalData', JSON.stringify(data.hospital));
+                    
+                    // التوجيه بعد ثانيتين
+                    setTimeout(() => {
+                        window.location.href = 'hospital-dashboard.html';
+                    }, 2000);
+                } else {
+                    throw new Error(data.error || 'فشل إنشاء الحساب');
+                }
+            } catch (error) {
+                showError(error.message);
+                registerBtn.innerHTML = '<i class="fas fa-user-plus"></i> إنشاء الحساب';
+                registerBtn.disabled = false;
+            }
+        }
+
+        // مستمعي الأحداث
+        passwordInput.addEventListener('input', function() {
+            checkPasswordStrength(this.value);
+            checkPasswordMatch();
+        });
+
+        confirmPasswordInput.addEventListener('input', checkPasswordMatch);
+
+        document.getElementById('passwordForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            registerHospital();
+        });
+
+        // تحسين تجربة المستخدم
+        document.addEventListener('DOMContentLoaded', function() {
+            // في بيئة التطوير، يمكن تعبئة بيانات تجريبية
+            if (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') {
+                nameInput.value = 'مستشفى الأمومة التجريبي';
+                phoneInput.value = '0555555555';
+                emailInput.value = 'hospital@test.com';
+                addressInput.value = 'الرياض - حي النخيل';
+                passwordInput.value = '123456';
+                confirmPasswordInput.value = '123456';
+                agreeTerms.checked = true;
+                
+                // تحديث حالة كلمة المرور
+                checkPasswordStrength(passwordInput.value);
+                checkPasswordMatch();
+            }
+        });
+    </script>
+</body>
+</html>
