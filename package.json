@@ -1,0 +1,29 @@
+{
+  "name": "vaccination-system",
+  "version": "1.0.0",
+  "description": "نظام تذكير تطعيمات الأطفال للمستشفيات",
+  "main": "server/server.js",
+  "scripts": {
+    "start": "node server/server.js",
+    "setup": "node server/setup.js",
+    "dev": "nodemon server/server.js",
+    "docker:up": "docker-compose up -d",
+    "docker:down": "docker-compose down"
+  },
+  "keywords": ["vaccination", "hospital", "reminder", "children"],
+  "author": "Your Name",
+  "license": "MIT",
+  "dependencies": {
+    "express": "^4.18.0",
+    "mongoose": "^7.0.0",
+    "cors": "^2.8.5",
+    "dotenv": "^16.0.0",
+    "bcryptjs": "^2.4.3",
+    "jsonwebtoken": "^9.0.0",
+    "nodemailer": "^6.9.0",
+    "moment": "^2.29.0"
+  },
+  "devDependencies": {
+    "nodemon": "^2.0.0"
+  }
+}
